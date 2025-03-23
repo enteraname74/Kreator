@@ -5,54 +5,51 @@ package com.github.enteraname74.kreator.core.domain
  */
 sealed class Dependency {
     abstract val name: String
-    abstract val version: Version
     abstract val targets: List<Target>
-    abstract val tomlPath: String
 
     data class Plugin(
         override val name: String,
-        override val version: Version,
-        val canUseAlias: Boolean = true,
+        val version: Version?,
+        val mode: Mode = Mode.Alias,
         val id: String,
     ): Dependency() {
         override val targets: List<Target> = emptyList()
-        
-        override val tomlPath: String
+        val tomlPath: String
             get() = "libs.plugins.${name.replace("-",".")}"
 
-        /**
-         * Alias use of the plugin in a build.gradle.kts file
-         */
-        private fun alias(): String =
-            "alias($tomlPath)"
-
-        /**
-         * Id use of the plugin in a build.gradle.kts file
-         */
-        private fun id(): String =
-            "id($name)"
-
         fun usePlugin(): String =
-            if (canUseAlias) alias() else id()
+            when(mode) {
+                Mode.Alias -> "alias($tomlPath)"
+                Mode.Id -> """id("$id")"""
+                Mode.Kotlin -> """kotlin("$id")"""
+            }
 
-        override fun toString(): String =
-            """$name = { id = "$id", version.ref = "${version.name}" }"""
+        fun tomlDeclaration(): String =
+            version?.let {
+                """$name = { id = "$id", version.ref = "${version.name}" }"""
+            } ?: ""
+
+        enum class Mode {
+            Alias,
+            Id,
+            Kotlin,
+        }
     }
 
     data class Library(
         override val name: String,
-        override val version: Version,
         override val targets: List<Target>,
         val module: String,
+        val version: Version,
         val bundleName: String? = null,
-    ): Dependency() {
-        override val tomlPath: String
+    ): Implementable() {
+        val tomlPath: String
             get() = "libs.${name.replace("-",".")}"
 
         /**
          * Library implementation in a build.gradle.kts file
          */
-        fun implementation(): String =
+        override fun implementation(): String =
             "implementation($tomlPath)"
 
         /**
@@ -65,12 +62,24 @@ sealed class Dependency {
             """$name = { module = "$module", version.ref = "${version.name}" }"""
     }
 
+    data class Module(
+        override val name: String,
+        override val targets: List<Target>,
+    ): Implementable() {
+        override fun implementation(): String =
+            """implementation(project(":$name"))"""
+    }
+
     data class Version(
         val name: String,
         val version: String,
     ) {
         override fun toString(): String =
             """$name = "$version""""
+    }
+
+    abstract class Implementable: Dependency() {
+        abstract fun implementation(): String
     }
 }
 

@@ -1,5 +1,6 @@
 package com.github.enteraname74.kreator.core
 
+import com.github.enteraname74.kreator.core.domain.Dependency
 import com.github.enteraname74.kreator.core.domain.Module
 import com.github.enteraname74.kreator.core.domain.Project
 import com.github.enteraname74.kreator.core.domain.ProjectBuildGradleKts
@@ -16,7 +17,12 @@ object ProjectGenerator {
         val projectBuildGradleKts = ProjectBuildGradleKts(
             aliasPluginsPath = buildList {
                 project.modules.forEach { module ->
-                    addAll(module.plugins.map { it.tomlPath })
+                    addAll(
+                        module
+                            .plugins
+                            .filter { it.mode == Dependency.Plugin.Mode.Alias }
+                            .map { it.tomlPath }
+                    )
                 }
             }.distinct().sorted()
         )
@@ -46,12 +52,20 @@ object ProjectGenerator {
         getResourcesFile(".gitignore").copyTo(gitignore, overwrite = true)
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun writeGradleFolder(projectDirectory: File, project: Project) {
         val gradleFolder = File(projectDirectory, "gradle").also { it.mkdirs() }
 
         val versionCatalog = VersionCatalog(
             plugins = project.modules.map { it.plugins }.flatten().distinct(),
-            libraries = project.modules.map { it.dependencies }.flatten().distinct(),
+            libraries = project.modules.map { it.dependencies }
+                .flatten()
+                .filter { it is Dependency.Library }
+                .distinct() as List<Dependency.Library>,
+            bundlesNames = project.modules
+                .map { it.bundlesName }
+                .flatten()
+                .distinct()
         )
 
         File(gradleFolder, "libs.versions.toml").writeText(versionCatalog.build())

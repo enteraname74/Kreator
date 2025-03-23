@@ -33,4 +33,20 @@ object Plugins {
         version = Versions.KOTLIN,
         id = "org.jetbrains.kotlin.plugin.serialization",
     )
+    val KAPT = Dependency.Plugin(
+        name = "kapt",
+        version = null,
+        id = "kapt",
+        mode = Dependency.Plugin.Mode.Kotlin,
+    )
+
+    val ALL: List<Dependency.Plugin> = listOf(
+        ANDROID_APPLICATION,
+        ANDROID_LIBRARY,
+        JETBRAINS_COMPOSE,
+        KOTLIN_MULTIPLATFORM,
+        COMPOSE_COMPILER,
+        KOTLIN_SERIALIZATION,
+        KAPT,
+    )
 }

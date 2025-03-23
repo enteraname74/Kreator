@@ -46,3 +46,9 @@ sealed interface Target {
             """jvm("desktop")"""
     }
 }
+
+fun List<Target>.hasAndroidTarget(): Boolean =
+    any { it is Target.Android }
+
+fun List<Target>.hasDesktopTarget(): Boolean =
+    any { it is Target.Desktop }

@@ -1,44 +1,60 @@
 package com.github.enteraname74.kreator.core.domain
 
+import com.github.enteraname74.kreator.core.data.Bundles
 import com.github.enteraname74.kreator.core.ext.whiteSpace
 
 class VersionCatalog(
     private val plugins: List<Dependency.Plugin>,
-    private val libraries: List<Dependency.Library>
+    private val libraries: List<Dependency.Library>,
+    private val bundlesNames: List<String>,
 ) {
     val versions: List<Dependency.Version>
-        get() = (plugins.map { it.version } + libraries.map { it.version }).distinct()
+        get() = (plugins.mapNotNull { it.version } + libraries.map { it.version }).distinct()
 
     fun addVersions(): String = buildString {
         appendLine("[versions]")
-        versions.sortedBy { it.name }.forEach { version ->
+
+        val withBundles = versions + Bundles.ALL
+            .filterKeys { bundlesNames.contains(it) }
+            .values
+            .flatten()
+            .map { it.version }
+            .distinctBy { it.name }
+
+        withBundles.sortedBy { it.name }.forEach { version ->
             appendLine(version)
         }
     }
 
     fun addPlugins(): String = buildString {
         appendLine("[plugins]")
-        plugins.sortedBy { it.name }.forEach { plugin ->
-            appendLine(plugin)
+        plugins.filter { it.mode == Dependency.Plugin.Mode.Alias }.sortedBy { it.name }.forEach { plugin ->
+            appendLine(plugin.tomlDeclaration())
         }
     }
 
     fun addLibraries(): String = buildString {
         appendLine("[libraries]")
-        libraries.sortedBy { it.name }.forEach { library ->
+
+        val withBundles = libraries + Bundles.ALL
+            .filterKeys { bundlesNames.contains(it) }
+            .values
+            .flatten()
+            .distinctBy { it.name }
+
+        withBundles.sortedBy { it.name }.forEach { library ->
             appendLine(library)
         }
     }
 
     fun addBundles(): String = buildString {
-        appendLine("[bundles]")
-        val bundles = libraries
-            .sortedBy { it.bundleName }
-            .groupBy { it.bundleName }
-            .filterKeys { it != null }
+        if (bundlesNames.isNotEmpty()) {
+            appendLine("[bundles]")
+            val bundles = Bundles.ALL.filterKeys { bundlesNames.contains(it) }
 
-        bundles.forEach { bundle ->
-            appendLine(bundle.value.toBundle(bundleName = bundle.key!!))
+            bundles.forEach { bundle ->
+                appendLine(bundle.value.toBundle(bundleName = bundle.key))
+            }
         }
     }
 

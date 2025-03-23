@@ -3,6 +3,7 @@ package com.github.enteraname74.kreator.core.data
 import com.github.enteraname74.kreator.core.domain.BuildType
 import com.github.enteraname74.kreator.core.domain.Dependency
 import com.github.enteraname74.kreator.core.domain.Target
+import kotlinx.coroutines.flow.Flow
 
 val DEFAULT_ANDROID_TARGET = Target.Android(
     compileSdk = 35,
@@ -51,7 +52,7 @@ object Libraries {
         name = "androidx-core",
         version = Versions.ANDROIDX_CORE,
         targets = listOf(DEFAULT_ANDROID_TARGET),
-        module = "androidx-core:core-ktx",
+        module = "androidx.core:core-ktx",
         bundleName = Bundles.ANDROIDX,
     )
     val ANDROIDX_LIFECYCLE = Dependency.Library(
@@ -196,7 +197,7 @@ object Libraries {
         module = "io.ktor:ktor-client-cio",
     )
     val KTOR_CLIENT_CONTENT_NEGOTIATION = Dependency.Library(
-        name = "ktor_client-content-negotiation",
+        name = "ktor-client-content-negotiation",
         version = Versions.KTOR,
         targets = ALL_TARGETS,
         module = "io.ktor:ktor-client-content-negotiation",
@@ -268,5 +269,45 @@ object Libraries {
         version = Versions.SQLITE_JDBC,
         targets = listOf(Target.Desktop),
         module = "org.xerial:sqlite-jdbc",
+    )
+
+    val ALL: List<Dependency.Library> = listOf(
+        ANDROIDX_ACTIVITY_COMPOSE,
+        ANDROIDX_ANNOTATION,
+        ANDROIDX_APP_COMPAT,
+        ANDROIDX_APP_COMPAT_RESOURCES,
+        ANDROIDX_CORE,
+        ANDROIDX_LIFECYCLE,
+        COIL,
+        COIL_COMPOSE,
+        COROUTINES_CORE,
+        COROUTINES_CORE_SWING,
+        EXPOSED_CORE,
+        EXPOSED_CRYPT,
+        EXPOSED_DAO,
+        EXPOSED_FLOWS,
+        EXPOSED_JDBC,
+        EXPOSED_JAVA_TIME,
+        FILE_KIT,
+        GSON,
+        KOIN_ANDROIDX_COMPOSE,
+        KOIN_COMPOSE,
+        KOIN_CORE,
+        KOTLIN_TEST,
+        KOTLINX_SERIALIZATION_CORE,
+        KOTLINX_SERIALIZATION_JSON,
+        KTOR_CLIENT_CIO,
+        KTOR_CLIENT_CONTENT_NEGOTIATION,
+        KTOR_CLIENT_CORE,
+        KTOR_SERIALIZATION_KOTLINX_JSON,
+        KTOR_SERIALIZATION_GSON,
+        MULTIPLATFORM_SETTINGS,
+        VOYAGER_NAVIGATOR,
+        VOYAGER_NAVIGATOR,
+        VOYAGER_SCREENMODEL,
+        VOYAGER_TRANSITIONS,
+        VOYAGER_KOIN,
+        ROOM,
+        SQLITE_JDBC,
     )
 }

@@ -1,32 +1,27 @@
 package com.github.enteraname74.kreator.core
 
 import com.github.enteraname74.kreator.core.data.ALL_TARGETS
-import com.github.enteraname74.kreator.core.data.Libraries
-import com.github.enteraname74.kreator.core.data.Plugins
-import com.github.enteraname74.kreator.core.domain.Module
+import com.github.enteraname74.kreator.core.data.Modules
 import com.github.enteraname74.kreator.core.domain.Project
 
 fun main() {
     val project = Project(
         name = "KREATOR_TEST_PROJECT",
         path = "/home/noah/Documents/Projets",
+        javaVersion = "17",
+        group = "com.github.enteraname74.kreatortestproject",
+        targets = ALL_TARGETS,
+    ).apply {
         modules = listOf(
-            Module(
-                name = "domain",
-                group = "com.github.enteraname74.kreatortestproject",
-                description = "domain part",
-                javaVersion = "17",
-                dependencies = listOf(
-                    Libraries.COROUTINES_CORE,
-                ),
-                plugins = listOf(
-                    Plugins.KOTLIN_MULTIPLATFORM,
-                    Plugins.ANDROID_LIBRARY,
-                ),
-                targets = ALL_TARGETS,
-            )
+            Modules.domain(this),
+            Modules.app(this),
+            Modules.remote(this),
+            Modules.repository(this),
+            Modules.local(this),
+            Modules.config(this),
+            Modules.coreUi(this)
         )
-    )
+    }
 
     ProjectGenerator.generateProject(project)
 }
