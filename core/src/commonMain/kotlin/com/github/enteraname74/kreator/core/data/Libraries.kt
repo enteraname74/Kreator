@@ -147,6 +147,12 @@ object Libraries {
         targets = listOf(Target.Desktop),
         module = "com.google.code.gson:gson",
     )
+    val GRADLE = Dependency.Library(
+        name = "gradle",
+        version = Versions.AGP,
+        targets = ALL_TARGETS,
+        module = "com.android.tools.build:gradle",
+    )
 
     val KOIN_ANDROIDX_COMPOSE = Dependency.Library(
         name = "koin-android-compose",

@@ -6,11 +6,13 @@ object Plugins {
     val ANDROID_APPLICATION = Dependency.Plugin(
         name = "android-application",
         version = Versions.AGP,
+        mode = Dependency.Plugin.Mode.Id,
         id = "com.android.application",
     )
     val ANDROID_LIBRARY = Dependency.Plugin(
         name = "android-library",
         version = Versions.AGP,
+        mode = Dependency.Plugin.Mode.Id,
         id = "com.android.library",
     )
     val JETBRAINS_COMPOSE = Dependency.Plugin(

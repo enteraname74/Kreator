@@ -1,5 +1,7 @@
 package com.github.enteraname74.kreator.core.domain
 
+import com.github.enteraname74.kreator.core.data.Plugins
+
 /**
  * Represent a Dependency (plugin or library) to add to libs.versions.toml
  */
@@ -91,3 +93,6 @@ fun List<Dependency.Library>.toBundle(bundleName: String): String =
     ) { dependency ->
         """"${dependency.name}""""
     }
+
+fun List<Dependency.Plugin>.hasAndroidPlugin(): Boolean =
+    any { it.name == Plugins.ANDROID_LIBRARY.name || it.name == Plugins.ANDROID_APPLICATION.name }

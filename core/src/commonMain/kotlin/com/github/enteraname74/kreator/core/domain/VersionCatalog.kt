@@ -1,6 +1,8 @@
 package com.github.enteraname74.kreator.core.domain
 
 import com.github.enteraname74.kreator.core.data.Bundles
+import com.github.enteraname74.kreator.core.data.Libraries
+import com.github.enteraname74.kreator.core.data.Versions
 import com.github.enteraname74.kreator.core.ext.whiteSpace
 
 class VersionCatalog(
@@ -9,17 +11,24 @@ class VersionCatalog(
     private val bundlesNames: List<String>,
 ) {
     val versions: List<Dependency.Version>
-        get() = (plugins.mapNotNull { it.version } + libraries.map { it.version }).distinct()
+        get() = (plugins.filter { it.mode == Dependency.Plugin.Mode.Alias }.mapNotNull { it.version } + libraries.map { it.version }).distinct()
 
     fun addVersions(): String = buildString {
         appendLine("[versions]")
 
-        val withBundles = versions + Bundles.ALL
-            .filterKeys { bundlesNames.contains(it) }
-            .values
-            .flatten()
-            .map { it.version }
-            .distinctBy { it.name }
+        val withBundles = buildList {
+            addAll(versions)
+            addAll(Bundles.ALL
+                .filterKeys { bundlesNames.contains(it) }
+                .values
+                .flatten()
+                .map { it.version }
+                .distinctBy { it.name })
+
+            if (plugins.hasAndroidPlugin()) {
+                add(Versions.AGP)
+            }
+        }
 
         withBundles.sortedBy { it.name }.forEach { version ->
             appendLine(version)
@@ -36,11 +45,20 @@ class VersionCatalog(
     fun addLibraries(): String = buildString {
         appendLine("[libraries]")
 
-        val withBundles = libraries + Bundles.ALL
-            .filterKeys { bundlesNames.contains(it) }
-            .values
-            .flatten()
-            .distinctBy { it.name }
+        val withBundles = buildList {
+            addAll(libraries)
+            addAll(
+                Bundles.ALL
+                    .filterKeys { bundlesNames.contains(it) }
+                    .values
+                    .flatten()
+                    .distinctBy { it.name }
+            )
+
+            if (plugins.hasAndroidPlugin()) {
+                add(Libraries.GRADLE)
+            }
+        }
 
         withBundles.sortedBy { it.name }.forEach { library ->
             appendLine(library)

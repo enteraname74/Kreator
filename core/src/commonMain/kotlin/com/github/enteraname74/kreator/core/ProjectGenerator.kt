@@ -6,6 +6,7 @@ import com.github.enteraname74.kreator.core.domain.Project
 import com.github.enteraname74.kreator.core.domain.ProjectBuildGradleKts
 import com.github.enteraname74.kreator.core.domain.SettingsGradleKts
 import com.github.enteraname74.kreator.core.domain.VersionCatalog
+import com.github.enteraname74.kreator.core.domain.hasAndroidPlugin
 import java.io.File
 
 object ProjectGenerator {
@@ -15,6 +16,10 @@ object ProjectGenerator {
 
     private fun writeProjectGradleFiles(projectDirectory: File, project: Project) {
         val projectBuildGradleKts = ProjectBuildGradleKts(
+            hasAndroidPlugins = project.modules
+                .map { it.plugins }
+                .flatten()
+                .hasAndroidPlugin(),
             aliasPluginsPath = buildList {
                 project.modules.forEach { module ->
                     addAll(
